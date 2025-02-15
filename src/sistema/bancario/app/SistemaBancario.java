@@ -139,76 +139,77 @@ public class SistemaBancario {
             scanner.nextLine();
 
             switch (opcao) {
-                case 1:
-                    System.out.print("Número da conta: ");
-                    int numeroConta = scanner.nextInt();
+            case 1:
+                System.out.print("Número da conta: ");
+                int numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                cliente.adicionarConta(new Conta(numeroConta), clientes); // 'clientes' é a lista de todos os clientes
+                break;
+            case 2:
+                cliente.listarContas();
+                break;
+            case 3:
+                System.out.print("Número da conta para depósito: ");
+                numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                Conta contaDeposito = cliente.buscarConta(numeroConta);
+                if (contaDeposito != null) {
+                    System.out.print("Valor para depósito: ");
+                    float valorDeposito = scanner.nextFloat();
                     scanner.nextLine();
-                    cliente.adicionarConta(new Conta(numeroConta));
-                    System.out.println("Conta criada com sucesso!");
-                    break;
-                case 2:
-                    cliente.listarContas();
-                    break;
-                case 3:
-                    System.out.print("Número da conta para depósito: ");
-                    numeroConta = scanner.nextInt();
+                    contaDeposito.depositar(valorDeposito);
+                } else {
+                    System.out.println("Conta não encontrada.");
+                }
+                break;
+            case 4:
+                System.out.print("Número da conta para saque: ");
+                numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                Conta contaSaque = cliente.buscarConta(numeroConta);
+                if (contaSaque != null) {
+                    System.out.print("Valor para saque: ");
+                    float valorSaque = scanner.nextFloat();
                     scanner.nextLine();
-                    Conta contaDeposito = cliente.buscarConta(numeroConta);
-                    if (contaDeposito != null) {
-                        System.out.print("Valor para depósito: ");
-                        float valorDeposito = scanner.nextFloat();
-                        scanner.nextLine();
-                        contaDeposito.depositar(valorDeposito);
-                    } else {
-                        System.out.println("Conta não encontrada.");
-                    }
-                    break;
-                case 4:
-                    System.out.print("Número da conta para saque: ");
-                    numeroConta = scanner.nextInt();
+                    contaSaque.sacar(valorSaque);
+                } else {
+                    System.out.println("Conta não encontrada.");
+                }
+                break;
+            case 5:
+                System.out.print("Número da conta de origem: ");
+                int numeroContaOrigem = scanner.nextInt();
+                scanner.nextLine();
+                Conta contaOrigem = cliente.buscarConta(numeroContaOrigem);
+                if (contaOrigem != null) {
+                    System.out.print("Número da conta de destino: ");
+                    int numeroContaDestino = scanner.nextInt();
                     scanner.nextLine();
-                    Conta contaSaque = cliente.buscarConta(numeroConta);
-                    if (contaSaque != null) {
-                        System.out.print("Valor para saque: ");
-                        float valorSaque = scanner.nextFloat();
-                        scanner.nextLine();
-                        contaSaque.sacar(valorSaque);
-                    } else {
-                        System.out.println("Conta não encontrada.");
-                    }
-                    break;
-                case 5:
-                    System.out.print("Número da conta de origem: ");
-                    int numeroContaOrigem = scanner.nextInt();
-                    scanner.nextLine();
-                    Conta contaOrigem = cliente.buscarConta(numeroContaOrigem);
-                    if (contaOrigem != null) {
-                        System.out.print("CPF do cliente de destino: ");
-                        String cpfDestino = scanner.nextLine();
-                        Cliente clienteDestino = buscarCliente(cpfDestino); 
 
-                        if (clienteDestino != null) {
-                            System.out.print("Número da conta de destino: ");
-                            int numeroContaDestino = scanner.nextInt();
-                            scanner.nextLine();
-                            
-                            Conta contaDestino = clienteDestino.buscarConta(numeroContaDestino);
-                            
-                            if (contaDestino != null) {
-                                System.out.print("Valor para transferência: ");
-                                float valorTransferencia = scanner.nextFloat();
-                                scanner.nextLine();
-                                contaOrigem.transferir(contaDestino, valorTransferencia);
-                            } else {
-                                System.out.println("Conta de destino não encontrada.");
-                            }
-                        } else {
-                            System.out.println("Cliente de destino não encontrado.");
+                    Conta contaDestino = null;
+                    Cliente clienteDestino = null;
+
+                    for (Cliente c : clientes) { 
+                        contaDestino = c.buscarConta(numeroContaDestino);
+                        if (contaDestino != null) {
+                            clienteDestino = c;
+                            break;
                         }
-                    } else {
-                        System.out.println("Conta de origem não encontrada.");
                     }
-                    break;
+
+                    if (contaDestino != null) {
+                        System.out.println("Cliente de destino: " + clienteDestino.getNome());
+                        System.out.print("Valor para transferência: ");
+                        float valorTransferencia = scanner.nextFloat();
+                        scanner.nextLine();
+                        contaOrigem.transferir(contaDestino, valorTransferencia);
+                    } else {
+                        System.out.println("Conta de destino não encontrada.");
+                    }
+                } else {
+                    System.out.println("Conta de origem não encontrada.");
+                }
+                break;
                 case 6:
                     System.out.print("Número da conta para ver o saldo: ");
                     numeroConta = scanner.nextInt();

@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class Conta implements Serializable {
-    private int numero;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private int numero;
     private float saldo;
     private LocalDateTime dataCriacao;
     private boolean status;

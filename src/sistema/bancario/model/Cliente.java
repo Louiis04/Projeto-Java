@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Cliente implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String nome;
     private String cpf;
     private ArrayList<Conta> contas;
@@ -20,8 +21,13 @@ public class Cliente implements Serializable {
         this.contas = new ArrayList<>();
     }
 
-    public void adicionarConta(Conta conta) {
-        contas.add(conta);
+    public void adicionarConta(Conta conta, ArrayList<Cliente> clientes) {
+        if (numeroContaExiste(clientes, conta.getNumero())) {
+            System.out.println("Número da conta já existe. Não é possível criar a conta.");
+        } else {
+            contas.add(conta);
+            System.out.println("Conta adicionada com sucesso!");
+        }
     }
 
     public void listarContas() {
@@ -65,6 +71,17 @@ public class Cliente implements Serializable {
 
     public String getNome() {
         return nome;
+    }
+
+    public static boolean numeroContaExiste(ArrayList<Cliente> clientes, int numeroConta) {
+        for (Cliente cliente : clientes) {
+            for (Conta conta : cliente.getContas()) {
+                if (conta.getNumero() == numeroConta) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
