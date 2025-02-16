@@ -1,16 +1,18 @@
 package sistema.bancario.app;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Scanner;
 import sistema.bancario.model.Cliente;
-import sistema.bancario.model.Conta;
-import sistema.bancario.persistencia.Persistencia;
+import sistema.bancario.model.IConta;
+import sistema.bancario.model.ContaCorrente;
+import sistema.bancario.model.ContaPoupanca;
 
 public class SistemaBancario {
     private ArrayList<Cliente> clientes;
 
     public SistemaBancario() {
-        this.clientes = Persistencia.carregarDados();
+        this.clientes = new ArrayList<>();
     }
 
     public void cadastrarCliente(String nome, String cpf) {
@@ -55,7 +57,7 @@ public class SistemaBancario {
             System.out.println("2. Listar clientes");
             System.out.println("3. Gerenciar contas de cliente");
             System.out.println("4. Remover cliente");
-            System.out.println("5. Salvar dados e sair");
+            System.out.println("5. Sair");
             System.out.print("Escolha uma opção: ");
             opcao = scanner.nextInt();
             scanner.nextLine();
@@ -81,13 +83,13 @@ public class SistemaBancario {
                         System.out.println("Cliente não encontrado.");
                     }
                     break;
-                    case 4:
+                case 4:
                     System.out.print("CPF do cliente a ser removido: ");
                     cpf = scanner.nextLine();
                     Cliente clienteParaRemover = buscarCliente(cpf);
                     if (clienteParaRemover != null) {
                         boolean temContaAtiva = false;
-                        for (Conta conta : clienteParaRemover.getContas()) {
+                        for (IConta conta : clienteParaRemover.getContas()) {
                             if (conta.isAtiva()) {
                                 temContaAtiva = true;
                                 break;
@@ -104,9 +106,7 @@ public class SistemaBancario {
                         System.out.println("Cliente não encontrado.");
                     }
                     break;
-                
                 case 5:
-                    Persistencia.salvarDados(clientes);
                     System.out.println("Saindo do sistema...");
                     break;
                 default:
@@ -143,7 +143,18 @@ public class SistemaBancario {
                 System.out.print("Número da conta: ");
                 int numeroConta = scanner.nextInt();
                 scanner.nextLine();
-                cliente.adicionarConta(new Conta(numeroConta), clientes); // 'clientes' é a lista de todos os clientes
+                System.out.println("Escolha o tipo de conta:");
+                System.out.println("1. Conta Corrente");
+                System.out.println("2. Conta Poupança");
+                int tipoConta = scanner.nextInt();
+                scanner.nextLine();
+                if (tipoConta == 1) {
+                    cliente.adicionarConta(new ContaCorrente(numeroConta), clientes);
+                } else if (tipoConta == 2) {
+                    cliente.adicionarConta(new ContaPoupanca(numeroConta), clientes);
+                } else {
+                    System.out.println("Tipo de conta inválido.");
+                }
                 break;
             case 2:
                 cliente.listarContas();
@@ -152,10 +163,10 @@ public class SistemaBancario {
                 System.out.print("Número da conta para depósito: ");
                 numeroConta = scanner.nextInt();
                 scanner.nextLine();
-                Conta contaDeposito = cliente.buscarConta(numeroConta);
+                IConta contaDeposito = cliente.buscarConta(numeroConta);
                 if (contaDeposito != null) {
                     System.out.print("Valor para depósito: ");
-                    float valorDeposito = scanner.nextFloat();
+                    BigDecimal valorDeposito = scanner.nextBigDecimal();
                     scanner.nextLine();
                     contaDeposito.depositar(valorDeposito);
                 } else {
@@ -166,10 +177,10 @@ public class SistemaBancario {
                 System.out.print("Número da conta para saque: ");
                 numeroConta = scanner.nextInt();
                 scanner.nextLine();
-                Conta contaSaque = cliente.buscarConta(numeroConta);
+                IConta contaSaque = cliente.buscarConta(numeroConta);
                 if (contaSaque != null) {
                     System.out.print("Valor para saque: ");
-                    float valorSaque = scanner.nextFloat();
+                    BigDecimal valorSaque = scanner.nextBigDecimal();
                     scanner.nextLine();
                     contaSaque.sacar(valorSaque);
                 } else {
@@ -180,13 +191,13 @@ public class SistemaBancario {
                 System.out.print("Número da conta de origem: ");
                 int numeroContaOrigem = scanner.nextInt();
                 scanner.nextLine();
-                Conta contaOrigem = cliente.buscarConta(numeroContaOrigem);
+                IConta contaOrigem = cliente.buscarConta(numeroContaOrigem);
                 if (contaOrigem != null) {
                     System.out.print("Número da conta de destino: ");
                     int numeroContaDestino = scanner.nextInt();
                     scanner.nextLine();
 
-                    Conta contaDestino = null;
+                    IConta contaDestino = null;
                     Cliente clienteDestino = null;
 
                     for (Cliente c : clientes) { 
@@ -200,7 +211,7 @@ public class SistemaBancario {
                     if (contaDestino != null) {
                         System.out.println("Cliente de destino: " + clienteDestino.getNome());
                         System.out.print("Valor para transferência: ");
-                        float valorTransferencia = scanner.nextFloat();
+                        BigDecimal valorTransferencia = scanner.nextBigDecimal();
                         scanner.nextLine();
                         contaOrigem.transferir(contaDestino, valorTransferencia);
                     } else {
@@ -210,77 +221,76 @@ public class SistemaBancario {
                     System.out.println("Conta de origem não encontrada.");
                 }
                 break;
-                case 6:
-                    System.out.print("Número da conta para ver o saldo: ");
-                    numeroConta = scanner.nextInt();
-                    scanner.nextLine();
-                    Conta contaSaldo = cliente.buscarConta(numeroConta);
-                    if (contaSaldo != null) {
-                        System.out.println("Saldo da conta: " + contaSaldo.getSaldo());
+            case 6:
+                System.out.print("Número da conta para ver o saldo: ");
+                numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                IConta contaSaldo = cliente.buscarConta(numeroConta);
+                if (contaSaldo != null) {
+                    System.out.println("Saldo da conta: R$" + contaSaldo.getSaldo());
+                } else {
+                    System.out.println("Conta não encontrada.");
+                }
+                break;
+            case 7:
+                System.out.print("Número da conta para remover: ");
+                numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                IConta contaParaRemover = cliente.buscarConta(numeroConta);
+                if (contaParaRemover != null) {
+                    if (!contaParaRemover.isAtiva() || contaParaRemover.getSaldo().compareTo(BigDecimal.ZERO) == 0) {
+                        cliente.removerConta(numeroConta);
+                        System.out.println("Conta removida com sucesso!");
                     } else {
-                        System.out.println("Conta não encontrada.");
+                        System.out.println("A conta está ativa e possui saldo, não pode ser removida.");
                     }
-                    break;
-                    case 7:
-                    System.out.print("Número da conta para remover: ");
-                    numeroConta = scanner.nextInt();
-                    scanner.nextLine();
-                    Conta contaParaRemover = cliente.buscarConta(numeroConta);
-                    if (contaParaRemover != null) {
-                        if (!contaParaRemover.isAtiva() || contaParaRemover.getSaldo() == 0) {
-                            cliente.removerConta(numeroConta);
-                            System.out.println("Conta removida com sucesso!");
-                        } else {
-                            System.out.println("A conta está ativa e possui saldo, não pode ser removida.");
-                        }
-                    } else {
-                        System.out.println("Conta não encontrada.");
+                } else {
+                    System.out.println("Conta não encontrada.");
+                }
+                break;
+            case 8:
+                System.out.print("Número da conta para ativar: ");
+                numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                IConta contaAtivar = cliente.buscarConta(numeroConta);
+                if (contaAtivar != null) {
+                    contaAtivar.ativar();
+                } else {
+                    System.out.println("Conta não encontrada.");
+                }
+                break;
+            case 9:
+                System.out.print("Número da conta para desativar: ");
+                numeroConta = scanner.nextInt();
+                scanner.nextLine();
+                IConta contaDesativar = cliente.buscarConta(numeroConta);
+                if (contaDesativar != null) {
+                    contaDesativar.desativar();
+                } else {
+                    System.out.println("Conta não encontrada.");
+                }
+                break;
+            case 10:
+                BigDecimal saldoCliente = BigDecimal.ZERO;
+                for (IConta conta : cliente.getContas()) {
+                    if (conta.isAtiva()) {
+                        saldoCliente = saldoCliente.add(conta.getSaldo());
                     }
-                    break;
-                
-                case 8:
-                    System.out.print("Número da conta para ativar: ");
-                    numeroConta = scanner.nextInt();
-                    scanner.nextLine();
-                    Conta contaAtivar = cliente.buscarConta(numeroConta);
-                    if (contaAtivar != null) {
-                        contaAtivar.ativar();
-                    } else {
-                        System.out.println("Conta não encontrada.");
-                    }
-                    break;
-                case 9:
-                    System.out.print("Número da conta para desativar: ");
-                    numeroConta = scanner.nextInt();
-                    scanner.nextLine();
-                    Conta contaDesativar = cliente.buscarConta(numeroConta);
-                    if (contaDesativar != null) {
-                        contaDesativar.desativar();
-                    } else {
-                        System.out.println("Conta não encontrada.");
-                    }
-                    break;
-                case 10:
-                    float saldoCliente = 0;
-                    for (Conta conta : cliente.getContas()) {
-                        if (conta.isAtiva()) {
-                            saldoCliente += conta.getSaldo();
-                        }
-                    }
-                    System.out.println("Balanço do cliente: " + saldoCliente);
-                    break;
-                case 11:
-                    System.out.println("Voltando ao menu principal...");
-                    break;
-                default:
-                    System.out.println("Opção inválida.");
-                    break;
+                }
+                System.out.println("Balanço do cliente: " + saldoCliente);
+                break;
+            case 11:
+                System.out.println("Voltando ao menu principal...");
+                break;
+            default:
+                System.out.println("Opção inválida.");
+                break;
             }
         } while (opcao != 11);
     }
 
     public static void main(String[] args) {
         SistemaBancario sistema = new SistemaBancario();
-        sistema.menu();
+        sistema.menu(); 
     }
 }

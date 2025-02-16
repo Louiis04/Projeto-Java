@@ -1,14 +1,13 @@
 package sistema.bancario.model;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Cliente implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Cliente {
     private String nome;
     private String cpf;
-    private ArrayList<Conta> contas;
+    private ArrayList<IConta> contas;
 
     public Cliente(String nome, String cpf) {
         this.nome = nome;
@@ -21,7 +20,7 @@ public class Cliente implements Serializable {
         this.contas = new ArrayList<>();
     }
 
-    public void adicionarConta(Conta conta, ArrayList<Cliente> clientes) {
+    public void adicionarConta(IConta conta, ArrayList<Cliente> clientes) {
         if (numeroContaExiste(clientes, conta.getNumero())) {
             System.out.println("Número da conta já existe. Não é possível criar a conta.");
         } else {
@@ -38,19 +37,19 @@ public class Cliente implements Serializable {
         }
     }
 
-    public Conta buscarConta(int numero) {
-        for (Conta conta : contas) {
+    public IConta buscarConta(int numero) {
+        for (IConta conta : contas) {
             if (conta.getNumero() == numero) {
-                return conta; 
+                return conta;
             }
         }
-        return null; 
+        return null;
     }
 
     public void removerConta(int numero) {
-        Conta conta = buscarConta(numero);
+        IConta conta = buscarConta(numero);
         if (conta != null) {
-            if (conta.getSaldo() == 0) {
+            if (conta.getSaldo().compareTo(BigDecimal.ZERO) == 0) {
                 contas.remove(conta);
                 System.out.println("Conta removida com sucesso!");
             } else {
@@ -61,7 +60,7 @@ public class Cliente implements Serializable {
         }
     }
 
-    public ArrayList<Conta> getContas() {
+    public ArrayList<IConta> getContas() {
         return contas;
     }
 
@@ -75,7 +74,7 @@ public class Cliente implements Serializable {
 
     public static boolean numeroContaExiste(ArrayList<Cliente> clientes, int numeroConta) {
         for (Cliente cliente : clientes) {
-            for (Conta conta : cliente.getContas()) {
+            for (IConta conta : cliente.getContas()) {
                 if (conta.getNumero() == numeroConta) {
                     return true;
                 }
