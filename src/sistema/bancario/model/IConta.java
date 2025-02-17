@@ -2,13 +2,18 @@ package sistema.bancario.model;
 
 import java.math.BigDecimal;
 
+import exceptions.ContaInexistenteException;
+import exceptions.SaldoInsuficienteException;
+import exceptions.StatusContaException;
+import exceptions.ValorInvalidoException;
+
 public interface IConta {
     
-    void depositar(BigDecimal valor);
+    void depositar(BigDecimal valor) throws ContaInexistenteException, ValorInvalidoException;
     
-    boolean sacar(BigDecimal valor);
+    void sacar(BigDecimal valor) throws ContaInexistenteException, SaldoInsuficienteException, ValorInvalidoException;
     
-    boolean transferir(IConta destino, BigDecimal valor);
+    void transferir(IConta destino, BigDecimal valor) throws ContaInexistenteException, SaldoInsuficienteException, ValorInvalidoException;
     
     BigDecimal getSaldo();
     
@@ -20,7 +25,7 @@ public interface IConta {
     
     void ativar();
     
-    void desativar();
+    void desativar() throws StatusContaException;
 
     BigDecimal calcularTarifaTransferencia(BigDecimal valor);
 }
