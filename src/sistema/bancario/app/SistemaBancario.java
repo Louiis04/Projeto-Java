@@ -6,6 +6,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import sistema.bancario.model.Cliente;
 import sistema.bancario.model.IConta;
+import sistema.bancario.persistencia.Persistencia;
 import sistema.bancario.model.ContaCorrente;
 import sistema.bancario.model.ContaPoupanca;
 import exceptions.ContaInexistenteException;
@@ -17,12 +18,13 @@ public class SistemaBancario {
     private ArrayList<Cliente> clientes;
 
     public SistemaBancario() {
-        this.clientes = new ArrayList<>();
+    	this.clientes = Persistencia.carregarDados();
     }
 
     public void cadastrarCliente(String nome, String cpf) {
         if (!clientes.contains(new Cliente(cpf))) {
             clientes.add(new Cliente(nome, cpf));
+            Persistencia.salvarDados(clientes);
             System.out.println("Cliente cadastrado com sucesso!");
         } else {
             System.out.println("Cliente já cadastrado.");
@@ -46,6 +48,7 @@ public class SistemaBancario {
         Cliente cliente = buscarCliente(cpf);
         if (cliente != null) {
             clientes.remove(cliente);  
+            Persistencia.salvarDados(clientes);
             System.out.println("Cliente removido com sucesso!");
         } else {
             System.out.println("Cliente não encontrado.");
@@ -113,6 +116,7 @@ public class SistemaBancario {
                         }
                         break;
                     case 5:
+                    	Persistencia.salvarDados(clientes);
                         System.out.println("Saindo do sistema...");
                         break;
                     default:
@@ -308,6 +312,7 @@ public class SistemaBancario {
                         System.out.println("Balanço do cliente: " + saldoCliente);
                         break;
                     case 11:
+                    	Persistencia.salvarDados(clientes);
                         System.out.println("Voltando ao menu principal...");
                         break;
                     default:

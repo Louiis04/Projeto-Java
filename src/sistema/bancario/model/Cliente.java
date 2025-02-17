@@ -1,11 +1,16 @@
 package sistema.bancario.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Cliente {
-    private String nome;
+public class Cliente implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String nome;
     private String cpf;
     private ArrayList<IConta> contas;
 

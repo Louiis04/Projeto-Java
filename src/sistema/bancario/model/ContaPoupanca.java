@@ -1,5 +1,6 @@
 package sistema.bancario.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -8,8 +9,13 @@ import exceptions.SaldoInsuficienteException;
 import exceptions.StatusContaException;
 import exceptions.ValorInvalidoException;
 
-public class ContaPoupanca implements IConta {
-    private static final BigDecimal TARIFA_TRANSFERENCIA = new BigDecimal("0.02"); 
+public class ContaPoupanca implements IConta, Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private static final BigDecimal TARIFA_TRANSFERENCIA = new BigDecimal("0.02"); 
 
     private int numero;
     private BigDecimal saldo;
