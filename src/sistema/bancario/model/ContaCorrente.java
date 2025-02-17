@@ -3,6 +3,8 @@ package sistema.bancario.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import exceptions.ContaInexistenteException;
 import exceptions.SaldoInsuficienteException;
@@ -10,23 +12,22 @@ import exceptions.StatusContaException;
 import exceptions.ValorInvalidoException;
 
 public class ContaCorrente implements IConta, Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final BigDecimal TARIFA_TRANSFERENCIA = new BigDecimal("0.02");
+    private static final BigDecimal TARIFA_TRANSFERENCIA = new BigDecimal("0.02");
 
     private int numero;
     private BigDecimal saldo;
     private LocalDateTime dataCriacao;
     private boolean status;
+    private List<Transacao> historico;
 
     public ContaCorrente(int numero) {
         this.numero = numero;
         this.saldo = BigDecimal.ZERO;
         this.setDataCriacao(LocalDateTime.now());
         this.status = true;
+        this.historico = new ArrayList<>();
     }
 
     public void depositar(BigDecimal valor) throws ContaInexistenteException, ValorInvalidoException {
@@ -38,6 +39,7 @@ public class ContaCorrente implements IConta, Serializable {
         }
 
         saldo = saldo.add(valor);
+        historico.add(new Transacao("Depósito", valor));
         System.out.println("Depósito de R$ " + valor + " realizado com sucesso!");
     }
 
@@ -53,6 +55,7 @@ public class ContaCorrente implements IConta, Serializable {
         }
 
         saldo = saldo.subtract(valor);
+        historico.add(new Transacao("Saque", valor));
         System.out.println("Saque de R$ " + valor + " realizado com sucesso!");
     }
 
@@ -79,7 +82,31 @@ public class ContaCorrente implements IConta, Serializable {
         BigDecimal valorComTarifa = valor.add(tarifa);
         this.setSaldo(this.getSaldo().subtract(valorComTarifa));
         destino.setSaldo(destino.getSaldo().add(valor));
-        System.out.println("Transferência de R$ " + valor + " realizada com sucesso!");
+
+        historico.add(new Transacao("Transferência enviada", valor, this.numero, destino.getNumero(), tarifa));
+        destino.getHistorico().add(new Transacao("Transferência recebida", valor, this.numero, destino.getNumero(), tarifa));
+
+        System.out.println("Transferência de R$ " + valor + " realizada com sucesso! (Tarifa: R$ " + tarifa + ")");
+    }
+
+    public void extratoPorMesAno(int mes, int ano) {
+        System.out.println("Extrato da Conta Corrente " + numero + " para " + mes + "/" + ano + ":");
+        boolean encontrou = false;
+
+        for (Transacao transacao : historico) {
+            if (transacao.getDataHora().getMonthValue() == mes && transacao.getDataHora().getYear() == ano) {
+                System.out.println(transacao);
+                encontrou = true;
+            }
+        }
+
+        if (!encontrou) {
+            System.out.println("Nenhuma transação encontrada para esse período.");
+        }
+    }
+
+    public List<Transacao> getHistorico() {
+        return historico;
     }
 
     @Override
@@ -107,6 +134,7 @@ public class ContaCorrente implements IConta, Serializable {
         this.status = true;
     }
 
+    @Override
     public void desativar() throws StatusContaException {
         if (this.saldo.compareTo(BigDecimal.ZERO) == 0) {
             this.status = false;

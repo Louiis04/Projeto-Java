@@ -143,11 +143,12 @@ public class SistemaBancario {
             System.out.println("4. Realizar saque");
             System.out.println("5. Transferir entre contas");
             System.out.println("6. Ver saldo da conta");
-            System.out.println("7. Remover conta");
-            System.out.println("8. Ativar conta");
-            System.out.println("9. Desativar conta");
-            System.out.println("10. Ver balanço do cliente");
-            System.out.println("11. Voltar");
+            System.out.println("7. Ver extrato da conta");
+            System.out.println("8. Remover conta");
+            System.out.println("9. Ativar conta");
+            System.out.println("10. Desativar conta");
+            System.out.println("11. Ver balanço do cliente");
+            System.out.println("12. Voltar");
             System.out.print("Escolha uma opção: ");
             try {
                 opcao = scanner.nextInt();
@@ -265,6 +266,25 @@ public class SistemaBancario {
                         }
                         break;
                     case 7:
+                        System.out.print("Número da conta para ver o extrato: ");
+                        numeroConta = scanner.nextInt();
+                        scanner.nextLine();
+
+                        IConta contaExtrato = cliente.buscarConta(numeroConta);
+                        if (contaExtrato != null) {
+                            System.out.print("Informe o mês (1-12): ");
+                            int mes = scanner.nextInt();
+                            System.out.print("Informe o ano (ex: 2024): ");
+                            int ano = scanner.nextInt();
+                            scanner.nextLine();
+
+                            contaExtrato.extratoPorMesAno(mes, ano);
+                        } else {
+                            System.out.println("Conta não encontrada.");
+                        }
+                        break;
+
+                    case 8:
                         System.out.print("Número da conta para remover: ");
                         numeroConta = scanner.nextInt();
                         scanner.nextLine();
@@ -280,7 +300,7 @@ public class SistemaBancario {
                             System.out.println("Conta não encontrada.");
                         }
                         break;
-                    case 8:
+                    case 9:
                         System.out.print("Número da conta para ativar: ");
                         numeroConta = scanner.nextInt();
                         scanner.nextLine();
@@ -291,7 +311,7 @@ public class SistemaBancario {
                             System.out.println("Conta não encontrada.");
                         }
                         break;
-                    case 9:
+                    case 10:
                         System.out.print("Número da conta para desativar: ");
                         numeroConta = scanner.nextInt();
                         scanner.nextLine();
@@ -302,7 +322,7 @@ public class SistemaBancario {
                             System.out.println("Conta não encontrada.");
                         }
                         break;
-                    case 10:
+                    case 11:
                         BigDecimal saldoCliente = BigDecimal.ZERO;
                         for (IConta conta : cliente.getContas()) {
                             if (conta.isAtiva()) {
@@ -311,7 +331,7 @@ public class SistemaBancario {
                         }
                         System.out.println("Balanço do cliente: " + saldoCliente);
                         break;
-                    case 11:
+                    case 12:
                     	Persistencia.salvarDados(clientes);
                         System.out.println("Voltando ao menu principal...");
                         break;
@@ -330,7 +350,7 @@ public class SistemaBancario {
                System.out.println("Erro: Conta ainda possui saldo!");
             }
             
-        } while (opcao != 11);
+        } while (opcao != 12);
     }
 
     public static void main(String[] args) {

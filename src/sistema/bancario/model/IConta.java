@@ -1,6 +1,7 @@
 package sistema.bancario.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import exceptions.ContaInexistenteException;
 import exceptions.SaldoInsuficienteException;
@@ -28,4 +29,8 @@ public interface IConta {
     void desativar() throws StatusContaException;
 
     BigDecimal calcularTarifaTransferencia(BigDecimal valor);
+    
+    void extratoPorMesAno(int mes, int ano);
+
+    List<Transacao> getHistorico();
 }
