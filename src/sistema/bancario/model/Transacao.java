@@ -87,16 +87,22 @@ public class Transacao implements Serializable{
         this.dataHora = dataHora;
     }
 
-    public String toString() {
+    public String toString(int numeroContaSolicitante) {
+        String tarifaInfo = "";
+        if (numeroContaSolicitante == numeroOrigem) {
+            tarifaInfo = "    Tarifa: R$ " + tarifa + "\n";
+        }
+
         return "Transação {\n" +
                 "    Tipo: " + tipo + "\n" +
                 "    Valor: R$ " + valor + "\n" +
-                "    Tarifa: R$ " + tarifa + "\n" +
+                tarifaInfo +
                 "    Data: " + dataHora + "\n" +
                 "    De: " + numeroOrigem + "\n" +
                 "    Para: " + numeroDestino + "\n" +
                 "}";
     }
+
 
 
 }

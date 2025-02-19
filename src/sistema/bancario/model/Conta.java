@@ -57,30 +57,7 @@ public abstract class Conta implements IConta, Serializable {
         System.out.println("Saque de R$ " + valor + " realizado com sucesso!");
     }
 
-    public void transferir(IConta destino, BigDecimal valor) throws ContaInexistenteException, SaldoInsuficienteException, ValorInvalidoException {
-        if (!this.status) {
-            throw new ContaInexistenteException("Erro: Não é possível transferir de uma conta inativa.");
-        }
-        if (!destino.isAtiva()) {
-            throw new ContaInexistenteException("Erro: Não é possível transferir para uma conta inativa.");
-        }
-        if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ValorInvalidoException("Erro: O valor da transferência deve ser maior que zero.");
-        }
-        if (valor.compareTo(this.saldo) > 0) {
-            throw new SaldoInsuficienteException("Erro: Saldo insuficiente para transferência.");
-        }
-
-        BigDecimal tarifa = calcularTarifaTransferencia(valor);
-        BigDecimal valorComTarifa = valor.add(tarifa);
-        this.setSaldo(this.getSaldo().subtract(valorComTarifa));
-        destino.setSaldo(destino.getSaldo().add(valor));
-
-        historico.add(new Transacao("Transferência enviada", valor, this.numero, destino.getNumero(), tarifa));
-        destino.getHistorico().add(new Transacao("Transferência recebida", valor, this.numero, destino.getNumero(), tarifa));
-
-        System.out.println("Transferência de R$ " + valor + " realizada com sucesso! (Tarifa: R$ " + tarifa + ")");
-    }
+    public abstract void transferir(IConta destino, BigDecimal valor) throws ContaInexistenteException, SaldoInsuficienteException, ValorInvalidoException;
     
     public void extratoPorMesAno(int mes, int ano) {
         System.out.println("Extrato da Conta Corrente " + numero + " para " + mes + "/" + ano + ":");
