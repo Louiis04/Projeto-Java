@@ -1,19 +1,15 @@
 package sistema.bancario.model;
 
 import java.math.BigDecimal;
-
 import exceptions.ContaInexistenteException;
 import exceptions.SaldoInsuficienteException;
 import exceptions.ValorInvalidoException;
 
 public class ContaPoupanca extends Conta {
 
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public ContaPoupanca(int numero) {
+    public ContaPoupanca(int numero) {
         super(numero);
     }
 
@@ -32,10 +28,15 @@ public class ContaPoupanca extends Conta {
             throw new SaldoInsuficienteException("Erro: Saldo insuficiente para transferência.");
         }
 
-        BigDecimal tarifa = calcularTarifaTransferencia(valor);
-        BigDecimal valorComTarifa = valor.add(tarifa);
+        BigDecimal tarifa = BigDecimal.ZERO;
+        BigDecimal valorFinal = valor;
 
-        this.setSaldo(this.getSaldo().subtract(valorComTarifa));
+        if (destino instanceof ContaCorrente) {
+            tarifa = calcularTarifaTransferencia(valor);
+            valorFinal = valor.add(tarifa);
+        }
+
+        this.setSaldo(this.getSaldo().subtract(valorFinal));
         destino.setSaldo(destino.getSaldo().add(valor));
 
         getHistorico().add(new Transacao("Transferência enviada", valor, this.getNumero(), destino.getNumero(), tarifa));
@@ -45,8 +46,6 @@ public class ContaPoupanca extends Conta {
     }
 
     public BigDecimal calcularTarifaTransferencia(BigDecimal valor) {
-        return valor.multiply(new BigDecimal("0.02")); 
+        return valor.multiply(new BigDecimal("0.02"));
     }
-    
-    
 }
