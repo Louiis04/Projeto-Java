@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import exceptions.ContaInexistenteException;
 import exceptions.SaldoInsuficienteException;
@@ -125,4 +126,23 @@ public abstract class Conta implements IConta, Serializable {
                 ", status=" + (status ? "Ativa" : "Inativa") +
                 '}';
     }
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(numero);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Conta other = (Conta) obj;
+		return numero == other.numero;
+	}
+    
+    
 }
